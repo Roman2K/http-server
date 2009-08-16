@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.dirname(__FILE__) + '/../lib'
+
+require 'optparse'
+require 'http_server'
+
+options = {}
+OptionParser.new do |args|
+  args.on("--host HOST", String) { |h| options[:Host] = h }
+  args.on("--port PORT", Integer) { |p| options[:Port] = p }
+  args.on("--environment", String) { |e| options[:Environment] = e }
+  args.parse!
+end
+
+app =
+  if File.file? "config/environment.rb"
+    env = ENV['RAILS_ENV'] = options[:Environment]
+    puts "** Starting Rails environment: #{env || '(default)'}"
+    require 'config/environment'
+    dispatcher = ActionController::Dispatcher.new
+    assets = Rack::File.new("public")
+    Rack::Cascade.new([dispatcher, assets])
+  else
+    raise "could not determine application type"
+  end
+
+HTTPServer.run(app) do |handler|
+  puts "** Listening on #{handler.interface}"
+end

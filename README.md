@@ -24,7 +24,3 @@ RubyGems:
 * Gem and `deps.rip`
 * Examples
 * Comprehensive executable
-
-## Credits
-
-Released under the MIT license: see the `LICENSE` file.
